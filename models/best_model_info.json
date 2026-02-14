@@ -1,0 +1,43 @@
+{
+    "scenario": "Skenario 6",
+    "topic_model": "LDA",
+    "classifier": "Random Forest",
+    "split_ratio": "80:20",
+    "metrics": {
+        "accuracy": 0.8,
+        "precision_macro": 0.780449435588344,
+        "recall_macro": 0.7663258663816014,
+        "f1_macro": 0.7693125513757577,
+        "hamming_loss": 0.05684931506849315
+    },
+    "best_params": [
+        {
+            "classifier__max_depth": 20,
+            "classifier__min_samples_leaf": 1,
+            "classifier__min_samples_split": 2,
+            "classifier__n_estimators": 100
+        },
+        {
+            "classifier__max_depth": null,
+            "classifier__min_samples_leaf": 1,
+            "classifier__min_samples_split": 2,
+            "classifier__n_estimators": 100
+        },
+        {
+            "classifier__max_depth": 20,
+            "classifier__min_samples_leaf": 1,
+            "classifier__min_samples_split": 2,
+            "classifier__n_estimators": 100
+        },
+        {
+            "classifier__max_depth": null,
+            "classifier__min_samples_leaf": 1,
+            "classifier__min_samples_split": 2,
+            "classifier__n_estimators": 100
+        }
+    ],
+    "gap_train_test": 0.15553477441470154,
+    "gap_test_validation": 0.029763605261774795,
+    "misclassified_count": 331,
+    "error_rate": 0.20406905055487054
+}

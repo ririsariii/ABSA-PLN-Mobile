@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hasil Batch - ABSA PLN Mobile</title>
+
+    <!-- Bootstrap 4 CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    
+    <!-- DataTables Bootstrap 4 CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css">
+    
+    <!-- Plotly JS -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+    <style>
+        :root {
+            --pln-primary: #125d72;
+            --pln-secondary: #14a2ba;
+            --pln-light: #e7f6f9;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 250px;
+            background-color: var(--pln-primary);
+            z-index: 1000;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+        }
+
+        .sidebar-logo {
+            padding: 20px;
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+        }
+
+        .sidebar-logo img {
+            max-width: 120px;
+        }
+
+        .sidebar-logo h5 {
+            color: white;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+
+        .sidebar-menu a {
+            display: block;
+            padding: 15px 25px;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar-menu a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-left-color: var(--pln-secondary);
+        }
+
+        .sidebar-menu a.active {
+            background-color: var(--pln-secondary);
+            border-left-color: white;
+        }
+
+        .sidebar-menu a i {
+            margin-right: 10px;
+            width: 20px;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            padding: 30px;
+            min-height: 100vh;
+            overflow-y: auto;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, var(--pln-primary) 0%, var(--pln-secondary) 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .result-card {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+
+        .btn-analyze {
+            background-color: var(--pln-primary);
+            color: white;
+            border: none;
+            padding: 12px 40px;
+            font-size: 16px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        .btn-analyze:hover {
+            background-color: var(--pln-secondary);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-download {
+            background-color: #125d72;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-download:hover {
+            background-color: #14a2ba;
+            transform: translateY(-2px);
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .chart-title {
+            font-weight: 600;
+            color: var(--pln-primary);
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        /* Main Table Wrapper - Scrollable */
+        .table-responsive {
+            max-height: 500px;
+            overflow-y: auto;
+            overflow-x: auto;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            position: relative;
+        }
+
+        #resultTable {
+            font-size: 0.9rem;
+            margin-bottom: 0;
+        }
+
+        #resultTable thead th {
+            background-color: var(--pln-primary) !important;
+            color: white !important;
+            font-weight: 600;
+            border: none;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        #resultTable tbody tr:hover {
+            background-color: var(--pln-light) !important;
+        }
+
+        /* Filtered Table Styles */
+        .filtered-table-container {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 2px solid var(--pln-secondary);
+        }
+
+        /* Filtered Table Scrollable */
+        .filtered-table-container .table-responsive {
+            max-height: 400px;
+            overflow-y: auto;
+            overflow-x: auto;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+        }
+
+        .filtered-table-container table {
+            margin-bottom: 0;
+        }
+
+        .filtered-table-container thead th {
+            background-color: var(--pln-primary);
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 5;
+        }
+
+        .filtered-table-container.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .filter-badge {
+            background: var(--pln-primary);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        .filter-badge i {
+            margin-right: 8px;
+        }
+
+        .filter-badge .close-filter {
+            cursor: pointer;
+            margin-left: 10px;
+            opacity: 0.8;
+        }
+
+        .filter-badge .close-filter:hover {
+            opacity: 1;
+        }
+
+        /* Scroll Indicator */
+        .scroll-hint {
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.85rem;
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+        .scroll-hint i {
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-5px);
+            }
+            60% {
+                transform: translateY(-3px);
+            }
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+            background: var(--pln-primary) !important;
+            color: white !important;
+            border: 1px solid var(--pln-primary) !important;
+        }
+
+        /* Custom Scrollbar */
+        .table-responsive::-webkit-scrollbar,
+        .filtered-table-container .table-responsive::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        .table-responsive::-webkit-scrollbar-track,
+        .filtered-table-container .table-responsive::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb,
+        .filtered-table-container .table-responsive::-webkit-scrollbar-thumb {
+            background: var(--pln-secondary);
+            border-radius: 10px;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb:hover,
+        .filtered-table-container .table-responsive::-webkit-scrollbar-thumb:hover {
+            background: var(--pln-primary);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .table-responsive {
+                max-height: 400px;
+            }
+            
+            .filtered-table-container .table-responsive {
+                max-height: 300px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-logo" onclick="window.location.href='/'">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="PLN Mobile" onerror="this.style.display='none'">
+            <h5>ABSA PLN Mobile</h5>
+        </div>
+        <div class="sidebar-menu">
+            <a href="/">
+                <i class="fas fa-book"></i> Panduan
+            </a>
+            <a href="/analisis-teks">
+                <i class="fas fa-keyboard"></i> Analisis Teks
+            </a>
+            <a href="/analisis-csv" class="active">
+                <i class="fas fa-file-csv"></i> Analisis File CSV
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="page-header">
+            <h1><i class="fas fa-chart-line"></i> Hasil Analisis Batch</h1>
+            <p class="mb-0">{{ total_reviews }} ulasan berhasil dianalisis</p>
+            <p class="mb-0">
+                Model: {{ model_info.topic_model }} + {{ model_info.classifier }} | 
+                Akurasi: {{ "%.2f"|format(model_info.metrics.accuracy * 100) }}% | 
+                F1-Score: {{ "%.2f"|format(model_info.metrics.f1_macro * 100) }}%
+            </p>
+        </div>
+
+        <!-- Result Table -->
+        <div class="result-card">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="mb-0" style="color: var(--pln-primary);">
+                    <i class="fas fa-table"></i> Hasil Analisis Detail
+                </h4>
+                <button class="btn-download" onclick="downloadCSV()">
+                    <i class="fas fa-download"></i> Download CSV
+                </button>
+            </div>
+
+            <div class="table-responsive">
+                {{ table|safe }}
+            </div>
+            <div class="scroll-hint">
+                <i class="fas fa-arrows-alt-v"></i> Scroll untuk melihat lebih banyak data
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="row">
+            {% if graphs.bar_chart %}
+            <div class="col-lg-6 mb-4">
+                <div class="chart-container">
+                    <div class="chart-title">
+                        <i class="fas fa-chart-bar"></i> Distribusi Sentimen per Aspek
+                        <small class="text-muted" style="font-size: 0.85rem; font-weight: normal;">
+                            (Klik bar untuk melihat detail ulasan)
+                        </small>
+                    </div>
+                    <div id="barChart"></div>
+                    
+                    <!-- Filtered Table for Bar Chart -->
+                    <div id="barChartFilteredTable" class="filtered-table-container">
+                        <div class="filter-badge">
+                            <i class="fas fa-filter"></i>
+                            <span id="barFilterLabel"></span>
+                            <span class="close-filter" onclick="clearBarFilter()">
+                                <i class="fas fa-times"></i>
+                            </span>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-striped" id="barFilteredTable">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Ulasan</th>
+                                        <th>User Experience</th>
+                                        <th>Service Quality</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if graphs.pie_chart %}
+            <div class="col-lg-6 mb-4">
+                <div class="chart-container">
+                    <div class="chart-title">
+                        <i class="fas fa-chart-pie"></i> Proporsi Sentimen Keseluruhan
+                        <small class="text-muted" style="font-size: 0.85rem; font-weight: normal;">
+                            (Klik slice untuk melihat detail ulasan)
+                        </small>
+                    </div>
+                    <div id="pieChart"></div>
+                    
+                    <!-- Filtered Table for Pie Chart -->
+                    <div id="pieChartFilteredTable" class="filtered-table-container">
+                        <div class="filter-badge">
+                            <i class="fas fa-filter"></i>
+                            <span id="pieFilterLabel"></span>
+                            <span class="close-filter" onclick="clearPieFilter()">
+                                <i class="fas fa-times"></i>
+                            </span>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-striped" id="pieFilteredTable">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Ulasan</th>
+                                        <th>Aspek</th>
+                                        <th>Sentimen</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Trend Charts -->
+        {% if graphs.line_charts %}
+        <div class="result-card">
+            <h4 style="color: var(--pln-primary); margin-bottom: 20px;">
+                <i class="fas fa-chart-line"></i> Tren Sentimen Tiap Aspek
+            </h4>
+
+            <div class="row">
+                {% for aspect, chart_json in graphs.line_charts.items() %}
+                <div class="col-lg-6 mb-4">
+                    <div class="chart-container">
+                        <div id="lineChart{{ loop.index }}"></div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Action Button -->
+        <div class="text-center mt-4">
+            <a href="/analisis-csv" class="btn-analyze">
+                <i class="fas fa-redo"></i> Analisis File Lain
+            </a>
+        </div>
+
+         <!-- Footer -->
+        <div class="text-center mt-5 pb-4">
+            <p class="text-muted">
+                <i class="fas fa-bolt text-warning"></i>
+                ABSA PLN Mobile &copy; 2026 - Aspect-Based Sentiment Analysis System
+            | Yuliani Purwitasari | Sistem Informasi, UPN "Veteran" Jawa Timur
+            </p>
+        </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    
+    <!-- Bootstrap 4 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
+
+    <!-- Data Storage -->
+    <script>
+        // Store all results data
+        var allResults = {{ df_results|tojson|safe }};
+        console.log('Total results:', allResults.length);
+    </script>
+
+    <!-- Initialize DataTables -->
+    <script>
+    $(document).ready(function() {
+        if ($('#resultTable').length) {
+            $('#resultTable').DataTable({
+                "pageLength": 25,
+                "order": [[0, "asc"]],
+                "language": {
+                    "search": "Cari:",
+                    "lengthMenu": "Tampilkan _MENU_ data",
+                    "info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                    "infoEmpty": "Menampilkan 0 sampai 0 dari 0 data",
+                    "infoFiltered": "(difilter dari _MAX_ total data)",
+                    "zeroRecords": "Tidak ada data yang cocok",
+                    "emptyTable": "Tidak ada data tersedia",
+                    "paginate": {
+                        "first": "Pertama",
+                        "last": "Terakhir",
+                        "next": "Selanjutnya",
+                        "previous": "Sebelumnya"
+                    }
+                }
+            });
+            console.log('✓ DataTables initialized');
+        }
+    });
+    </script>
+
+    <!-- Filter Functions -->
+    <script>
+    function filterByBarChart(aspect, sentiment) {
+        console.log('Filter:', aspect, sentiment);
+        
+        // Filter data
+        var filtered = allResults.filter(function(row) {
+            return row[aspect] === sentiment;
+        });
+        
+        console.log('Filtered results:', filtered.length);
+        
+        // Update label
+        $('#barFilterLabel').text(aspect + ' - ' + sentiment + ' (' + filtered.length + ' ulasan)');
+        
+        // Clear table
+        var tbody = $('#barFilteredTable tbody');
+        tbody.empty();
+        
+        // Color for sentiment
+        var sentimentColor = sentiment === 'Positive' ? '#28a745' : '#dc3545';
+        var sentimentIcon = sentiment === 'Positive' ? 'fa-smile' : 'fa-frown';
+        
+        // Populate table
+        filtered.forEach(function(row) {
+            var uxDisplay = row['User Experience'] || '–';
+            var sqDisplay = row['Service Quality'] || '–';
+            
+            // Add color to matching sentiment
+            if (uxDisplay === sentiment) {
+                uxDisplay = '<span style="color: ' + sentimentColor + '; font-weight: 600;"><i class="fas ' + sentimentIcon + '"></i> ' + sentiment + '</span>';
+            }
+            if (sqDisplay === sentiment) {
+                sqDisplay = '<span style="color: ' + sentimentColor + '; font-weight: 600;"><i class="fas ' + sentimentIcon + '"></i> ' + sentiment + '</span>';
+            }
+            
+            var tr = '<tr>' +
+                '<td>' + row.id + '</td>' +
+                '<td style="max-width: 300px;">' + row.ulasan.substring(0, 100) + (row.ulasan.length > 100 ? '...' : '') + '</td>' +
+                '<td>' + uxDisplay + '</td>' +
+                '<td>' + sqDisplay + '</td>' +
+                '</tr>';
+            tbody.append(tr);
+        });
+        
+        // Show container
+        $('#barChartFilteredTable').addClass('show');
+        
+        // Scroll to table
+        setTimeout(function() {
+            $('html, body').animate({
+                scrollTop: $('#barChartFilteredTable').offset().top - 100
+            }, 500);
+        }, 100);
+    }
+
+    function filterByPieChart(sentiment) {
+        console.log('Filter by sentiment:', sentiment);
+        
+        // Filter data - any aspect with this sentiment
+        var filtered = allResults.filter(function(row) {
+            return row['User Experience'] === sentiment || row['Service Quality'] === sentiment;
+        });
+        
+        console.log('Filtered results:', filtered.length);
+        
+        // Update label
+        $('#pieFilterLabel').text('Sentimen ' + sentiment + ' (semua aspek) - ' + filtered.length + ' ulasan');
+        
+        // Clear table
+        var tbody = $('#pieFilteredTable tbody');
+        tbody.empty();
+        
+        // Populate table
+        filtered.forEach(function(row) {
+            // Determine which aspects match
+            var aspects = [];
+            if (row['User Experience'] === sentiment) aspects.push('User Experience');
+            if (row['Service Quality'] === sentiment) aspects.push('Service Quality');
+            
+            var tr = '<tr>' +
+                '<td>' + row.id + '</td>' +
+                '<td style="max-width: 300px;">' + row.ulasan.substring(0, 100) + (row.ulasan.length > 100 ? '...' : '') + '</td>' +
+                '<td>' + aspects.join(', ') + '</td>' +
+                '<td><span style="color: ' + (sentiment === 'Positive' ? '#28a745' : '#dc3545') + '; font-weight: 600;">' + sentiment + '</span></td>' +
+                '</tr>';
+            tbody.append(tr);
+        });
+        
+        // Show container
+        $('#pieChartFilteredTable').addClass('show');
+        
+        // Scroll to table
+        setTimeout(function() {
+            $('html, body').animate({
+                scrollTop: $('#pieChartFilteredTable').offset().top - 100
+            }, 500);
+        }, 100);
+    }
+
+    function clearBarFilter() {
+        $('#barChartFilteredTable').removeClass('show');
+    }
+
+    function clearPieFilter() {
+        $('#pieChartFilteredTable').removeClass('show');
+    }
+    </script>
+
+    <!-- Plotly Charts with Click Events -->
+    <script>
+        {% if graphs.bar_chart %}
+        try {
+            var barData = {{ graphs.bar_chart|safe }};
+            Plotly.newPlot('barChart', barData.data, barData.layout, {responsive: true});
+            
+            // Add click event
+            document.getElementById('barChart').on('plotly_click', function(data) {
+                var point = data.points[0];
+                var aspect = point.x;  // "User Experience" or "Service Quality"
+                var sentiment = point.data.name;  // "Positive" or "Negative"
+                
+                filterByBarChart(aspect, sentiment);
+            });
+        } catch (e) {
+            console.error('Error bar chart:', e);
+        }
+        {% endif %}
+
+        {% if graphs.pie_chart %}
+        try {
+            var pieData = {{ graphs.pie_chart|safe }};
+            Plotly.newPlot('pieChart', pieData.data, pieData.layout, {responsive: true});
+            
+            // Add click event
+            document.getElementById('pieChart').on('plotly_click', function(data) {
+                var point = data.points[0];
+                var sentiment = point.label;  // "Positive" or "Negative"
+                
+                filterByPieChart(sentiment);
+            });
+        } catch (e) {
+            console.error('Error pie chart:', e);
+        }
+        {% endif %}
+
+        {% if graphs.line_charts %}
+        try {
+            var lineCharts = {{ graphs.line_charts|tojson|safe }};
+            var chartIndex = 1;
+            for (var aspect in lineCharts) {
+                var chartData = JSON.parse(lineCharts[aspect]);
+                Plotly.newPlot('lineChart' + chartIndex, chartData.data, chartData.layout, {responsive: true});
+                chartIndex++;
+            }
+        } catch (e) {
+            console.error('Error line charts:', e);
+        }
+        {% endif %}
+    </script>
+
+    <!-- Download CSV -->
+    <script>
+    function downloadCSV() {
+        const table = document.getElementById('resultTable');
+        if (!table) {
+            alert('Tabel tidak ditemukan');
+            return;
+        }
+
+        const csv = [];
+        const rows = table.querySelectorAll('tr');
+
+        for (let i = 0; i < rows.length; i++) {
+            const row = [];
+            const cols = rows[i].querySelectorAll('td, th');
+
+            for (let j = 0; j < cols.length; j++) {
+                let text = cols[j].innerText.trim();
+                text = text.replace(/\s*Positive/g, 'Positive');
+                text = text.replace(/\s*Negative/g, 'Negative');
+                text = text.replace(/[\u{1F600}-\u{1F64F}]/gu, '');
+                text = text.replace(/Lihat Selengkapnya/g, '');
+                text = text.replace(/Sembunyikan/g, '');
+                text = text.trim();
+                text = text.replace(/"/g, '""');
+                row.push('"' + text + '"');
+            }
+            csv.push(row.join(','));
+        }
+
+        const BOM = '\uFEFF';
+        const csvContent = BOM + csv.join('\n');
+        const blob = new Blob([csvContent], {type: 'text/csv;charset=utf-8;'});
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+
+        const now = new Date();
+        const timestamp = now.getFullYear() + 
+                         ('0' + (now.getMonth() + 1)).slice(-2) + 
+                         ('0' + now.getDate()).slice(-2) + '_' +
+                         ('0' + now.getHours()).slice(-2) + 
+                         ('0' + now.getMinutes()).slice(-2);
+
+        link.setAttribute('href', url);
+        link.setAttribute('download', 'hasil_analisis_' + timestamp + '.csv');
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    }
+    </script>
+</body>
+</html>

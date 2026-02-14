@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analisis CSV - ABSA PLN Mobile</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Plotly JS -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+    <style>
+        :root {
+            --pln-primary: #125d72;
+            --pln-secondary: #14a2ba;
+            --pln-light: #e7f6f9;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 250px;
+            background-color: var(--pln-primary);
+            padding: 0;
+            z-index: 1000;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-logo {
+            padding: 20px;
+            text-align: center;
+            background-color: rgba(0,0,0,0.1);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .sidebar-logo img {
+            max-width: 120px;
+            cursor: pointer;
+        }
+        
+        .sidebar-logo h5 {
+            color: white;
+            margin-top: 10px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+
+        .sidebar-menu a {
+            display: block;
+            padding: 15px 25px;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar-menu a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-left-color: var(--pln-secondary);
+        }
+
+        .sidebar-menu a.active {
+            background-color: var(--pln-secondary);
+            border-left-color: white;
+        }
+
+        .sidebar-menu a i {
+            margin-right: 10px;
+            width: 20px;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 250px;
+            padding: 30px;
+            min-height: 100vh;
+            background-color: #f8f9fa;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, var(--pln-primary) 0%, var(--pln-secondary) 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .upload-card {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+
+        .result-section {
+            display: none;
+        }
+
+        .result-card {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+
+        .btn-upload {
+            background-color: var(--pln-primary);
+            color: white;
+            border: none;
+            padding: 12px 40px;
+            font-size: 16px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        .btn-upload:hover {
+            background-color: var(--pln-secondary);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-download {
+            background-color: var(--pln-secondary);
+            color: white;
+            border: none;
+            padding: 10px 30px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        .btn-download:hover {
+            background-color: var(--pln-primary);
+            color: white;
+        }
+
+        .instruction-text {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            border: 2px dashed var(--pln-secondary);
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            background-color: var(--pln-light);
+            transition: all 0.3s;
+        }
+
+        .file-input-wrapper:hover {
+            border-color: var(--pln-primary);
+            background-color: #d0eef4;
+        }
+
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .table-wrapper {
+            max-height: 400px;
+            overflow-y: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .result-table {
+            margin-bottom: 0;
+        }
+
+        .result-table thead {
+            position: sticky;
+            top: 0;
+            background-color: var(--pln-primary);
+            color: white;
+            z-index: 10;
+        }
+
+        .result-table th {
+            padding: 12px;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .result-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 13px;
+        }
+
+        .result-table tbody tr:hover {
+            background-color: var(--pln-light);
+        }
+
+        .chart-row {
+            margin-bottom: 30px;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            height: 100%;
+        }
+
+        .chart-title {
+            color: var(--pln-primary);
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .plotly-graph-div {
+            height: 350px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-logo" onclick="window.location.href='/'">
+            <img src="{{ url_for('static', filename='/images/logo.png') }}" alt="PLN Mobile">
+        </div>
+
+        <div class="sidebar-menu">
+            <a href="/">
+                <i class="fas fa-book"></i> Panduan
+            </a>
+            <a href="/analisis-teks">
+                <i class="fas fa-keyboard"></i> Analisis Teks
+            </a>
+            <a href="/analisis-csv" class="active">
+                <i class="fas fa-file-csv"></i> Analisis File CSV
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="page-header">
+            <h1><i class="fas fa-file-csv"></i> Analisis File Ulasan Aplikasi PLN Mobile</h1>
+            <p class="mb-0">Upload file CSV untuk analisis batch dan visualisasi tren sentimen</p>
+        </div>
+
+        <!-- Upload Form -->
+        <div class="upload-card" id="uploadSection">
+            <p class="instruction-text">
+                <i class="fas fa-info-circle"></i> Upload file CSV (kolom: <strong>id</strong>, <strong>ulasan</strong>,
+                <strong>tanggal</strong>)
+            </p>
+
+            <form id="uploadForm">
+                <div class="file-input-wrapper">
+                    <i class="fas fa-cloud-upload-alt fa-3x"
+                        style="color: var(--pln-secondary); margin-bottom: 15px;"></i>
+                    <p style="margin-bottom: 10px; font-weight: 500;">Klik atau drag file CSV ke sini</p>
+                    <p style="font-size: 12px; color: #999;">Format: CSV dengan kolom id, ulasan, tanggal | Max: 16MB
+                    </p>
+                    <input type="file" id="csvFile" accept=".csv" required>
+                    <p id="fileName" style="margin-top: 15px; font-weight: 600; color: var(--pln-primary);"></p>
+                </div>
+
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn-upload">
+                        <i class="fas fa-chart-bar"></i> Analisis
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Result Section -->
+        <div class="result-section" id="resultSection">
+            <!-- Result Table -->
+            <div class="result-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 style="color: var(--pln-primary); margin: 0;">
+                        <i class="fas fa-table"></i> Hasil Analisis
+                    </h3>
+                    <button class="btn-download" onclick="downloadCSV()">
+                        <i class="fas fa-download"></i> Download CSV
+                    </button>
+                </div>
+
+                <div class="table-wrapper">
+                    <table class="table result-table" id="resultTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Ulasan</th>
+                                <th>Tanggal</th>
+                                <th>User Experience</th>
+                                <th>Service Quality</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultBody">
+                            <!-- Results will be inserted here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="chart-row row">
+                <div class="col-lg-6 mb-4">
+                    <div class="chart-container">
+                        <div class="chart-title">
+                            <i class="fas fa-chart-bar"></i> Distribusi Sentimen per Aspek
+                        </div>
+                        <div id="barChart"></div>
+                    </div>
+                </div>
+                <div class="col-lg-6 mb-4">
+                    <div class="chart-container">
+                        <div class="chart-title">
+                            <i class="fas fa-chart-pie"></i> Proporsi Sentimen Keseluruhan
+                        </div>
+                        <div id="pieChart"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trend Charts -->
+            <div class="result-card">
+                <h3 style="color: var(--pln-primary); margin-bottom: 20px;">
+                    <i class="fas fa-chart-line"></i> Tren Sentimen Tiap Aspek
+                </h3>
+                <div id="lineChart"></div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center mt-5 pb-4">
+            <p class="text-muted">
+                <i class="fas fa-bolt text-warning"></i>
+                ABSA PLN Mobile &copy; 2026 - Aspect-Based Sentiment Analysis System
+            | Yuliani Purwitasari | Sistem Informasi, UPN "Veteran" Jawa Timur
+            </p>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // File input handler
+        document.getElementById('csvFile').addEventListener('change', function (e) {
+            const fileName = e.target.files[0]?.name || '';
+            document.getElementById('fileName').textContent = fileName ? `File: ${fileName}` : '';
+        });
+
+        document.getElementById('uploadForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const fileInput = document.getElementById('csvFile');
+            if (!fileInput.files.length) {
+                alert('Silakan pilih file CSV');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            try {
+                const response = await fetch('/predict_batch', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const err = await response.json();
+                    alert(err.error || 'Terjadi kesalahan');
+                    return;
+                }
+
+                // Flask mengembalikan HTML (render_template)
+                const html = await response.text();
+
+                // Replace seluruh halaman dengan hasil dari Flask
+                document.open();
+                document.write(html);
+                document.close();
+
+            } catch (error) {
+                console.error(error);
+                alert('Gagal menghubungi server');
+            }
+        });
+
+
+    </script>
+</body>
+
+</html>
