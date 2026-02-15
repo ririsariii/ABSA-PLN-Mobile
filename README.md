@@ -94,18 +94,12 @@ ABSA-PLN-Mobile/
 │       └── logo.png                # PLN Mobile logo
 │
 ├── uploads/                        # Temporary upload folder (auto-created)
-│
-└── notebooks/                      # Training notebooks (optional)
-    ├── 01_preprocessing.ipynb
-    ├── 02_topic_modeling.ipynb
-    ├── 03_model_training.ipynb
-    └── 04_evaluation.ipynb
 ```
 
 ## 🚀 Instalasi
 
 ### Prerequisites
-- Python 3.8 atau lebih tinggi
+- Python 3.11 atau lebih tinggi
 - pip package manager
 - Virtual environment (recommended)
 
@@ -113,7 +107,7 @@ ABSA-PLN-Mobile/
 
 1. **Clone repository**
 ```bash
-git clone https://github.com/yourusername/ABSA-PLN-Mobile.git
+git clone https://github.com/ririsariii/ABSA-PLN-Mobile.git
 cd ABSA-PLN-Mobile
 ```
 
@@ -152,25 +146,25 @@ http://localhost:5000
 ## 📦 Dependencies
 
 ```
-Flask==2.3.0
-pandas==1.5.3
-numpy==1.24.3
-scikit-learn==1.2.2
-imbalanced-learn==0.10.1
-joblib==1.2.0
-plotly==5.14.1
-werkzeug==2.3.0
+numpy==1.26.4
+pandas==2.1.4
+scikit-learn==1.6.1
+joblib==1.5.3
+Flask==3.0.0
+Werkzeug==3.0.1
+plotly==5.18.0
+python-dateutil==2.8.2
 ```
 
 ## 📊 Model Information
 
 ### Dataset
-- **Source**: Ulasan PLN Mobile dari Google Play Store
-- **Total Data**: 1,622 ulasan (setelah preprocessing)
+- **Source**: Ulasan PLN Mobile dari Google Play Store dan Apple App Store (26 September-26 Oktober 2025)
+- **Total Data**: 16,220 ulasan (setelah preprocessing)
 - **Split Ratio**: 
-  - Training: 80% (1,298 ulasan)
-  - Testing: 20% (324 ulasan)
-  - Validation: 10% dari total (162 ulasan)
+  - Training: 80% (11.678 ulasan)
+  - Testing: 20% ( 2.920 ulasan)
+  - Validation: 10% dari total (1.622 ulasan)
 
 ### Aspek yang Dianalisis
 1. **User Experience**: Aspek terkait pengalaman pengguna (UI/UX, navigasi, kemudahan penggunaan)
@@ -209,8 +203,7 @@ Aplikasi mudah digunakan dan customer service ramah
 ### 2. Analisis File CSV
 
 1. Klik menu **"Analisis File CSV"** di sidebar
-2. Siapkan file CSV dengan minimal kolom `ulasan`
-   - Kolom opsional: `id`, `tanggal`
+2. Siapkan file CSV dengan minimal kolom `id, ulasan, tanggal`
 3. Upload file CSV (max 16 MB)
 4. Klik **"Analisis"**
 5. Lihat hasil dalam tabel & visualisasi
@@ -323,7 +316,7 @@ Distributed under the MIT License. See `LICENSE` file for more information.
 
 ## 📞 Kontak
 
-- LinkedIn: [Your LinkedIn](https://www.linkedin.com/in/yuliani-purwitasari/)
+- LinkedIn: (https://www.linkedin.com/in/yuliani-purwitasari/)
 - Project Link: [https://github.com/yourusername/ABSA-PLN-Mobile](https://github.com/ririsariii/ABSA-PLN-Mobile)
 
 
