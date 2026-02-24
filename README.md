@@ -318,7 +318,7 @@ Distributed under the MIT License. See `LICENSE` file for more information.
 
 - LinkedIn: (https://www.linkedin.com/in/yuliani-purwitasari/)
 <<<<<<< HEAD
-- Project Link: [https://github.com/yourusername/ABSA-PLN-Mobile](https://github.com/ririsariii/ABSA-PLN-Mobile)
+- Project Link: [https://github.com/ririsariii/ABSA-PLN-Mobile](https://github.com/ririsariii/ABSA-PLN-Mobile)
 
 
 ⭐ **Star this repo if you find it useful!** ⭐
