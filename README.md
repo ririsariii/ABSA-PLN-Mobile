@@ -66,6 +66,76 @@ ABSA PLN Mobile adalah sistem yang dirancang untuk menganalisis ulasan pengguna 
 - **Tables**: DataTables
 - **Icons**: Font Awesome 5
 
+# 📸 System Visualization
+
+## 🔍 Text Analysis
+<p align="center">
+  <img src="analisis_teks.png" width="800">
+</p>
+
+This feature allows users to analyze individual PLN Mobile reviews and predict sentiments based on identified aspects in real time.
+
+---
+
+## 📂 File Analysis
+<p align="center">
+  <img src="analisis_file.png" width="800">
+</p>
+
+Users can upload CSV files containing multiple PLN Mobile reviews for batch sentiment analysis and automated processing.
+
+---
+
+## 📊 Bar Chart & Pie Chart Visualization
+<p align="center">
+  <img src="barchart_piechart.png" width="800">
+</p>
+
+Interactive charts visualize sentiment distribution and aspect proportions to help users understand overall review trends.
+
+---
+
+## 📈 Line Chart Analysis
+<p align="center">
+  <img src="linechart.png" width="800">
+</p>
+
+Line chart visualization used to monitor sentiment trends over time based on review dates.
+
+---
+
+## 📉 Detailed Line Chart
+<p align="center">
+  <img src="linechart_details.png" width="800">
+</p>
+
+Detailed line chart analysis provides deeper insight into PLN Mobile user sentiment patterns and fluctuations.
+
+---
+
+## ✅ Text Analysis Result
+<p align="center">
+  <img src="hasil_analisis_teks.png" width="800">
+</p>
+
+Displays prediction results for aspect categories and sentiment polarity from single text analysis.
+
+---
+
+## ✅ File Analysis Result
+<p align="center">
+  <img src="hasil_analisis_file.png" width="800">
+</p>
+
+Shows sentiment classification results from uploaded datasets along with filtering and export features.
+
+---
+
+## 📖 User Guide
+<p align="center">
+  <img src="panduan.png" width="800">
+</p>
+
 ## 📁 Struktur Folder
 
 ```
