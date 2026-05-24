@@ -68,9 +68,16 @@ ABSA PLN Mobile adalah sistem yang dirancang untuk menganalisis ulasan pengguna 
 
 # 📸 System Visualization
 
+---
+
+## 📖 User Guide
+<p align="center">
+  <img src="imagespanduan.png" width="800">
+</p>
+
 ## 🔍 Text Analysis
 <p align="center">
-  <img src="analisis_teks.png" width="800">
+  <img src="images/analisis_teks.png" width="800">
 </p>
 
 This feature allows users to analyze individual PLN Mobile reviews and predict sentiments based on identified aspects in real time.
@@ -79,7 +86,7 @@ This feature allows users to analyze individual PLN Mobile reviews and predict s
 
 ## 📂 File Analysis
 <p align="center">
-  <img src="analisis_file.png" width="800">
+  <img src="images/analisis_file.png" width="800">
 </p>
 
 Users can upload CSV files containing multiple PLN Mobile reviews for batch sentiment analysis and automated processing.
@@ -88,7 +95,7 @@ Users can upload CSV files containing multiple PLN Mobile reviews for batch sent
 
 ## 📊 Bar Chart & Pie Chart Visualization
 <p align="center">
-  <img src="barchart_piechart.png" width="800">
+  <img src="images/barchart_piechart.png" width="800">
 </p>
 
 Interactive charts visualize sentiment distribution and aspect proportions to help users understand overall review trends.
@@ -97,7 +104,7 @@ Interactive charts visualize sentiment distribution and aspect proportions to he
 
 ## 📈 Line Chart Analysis
 <p align="center">
-  <img src="linechart.png" width="800">
+  <img src="images/linechart.png" width="800">
 </p>
 
 Line chart visualization used to monitor sentiment trends over time based on review dates.
@@ -106,7 +113,7 @@ Line chart visualization used to monitor sentiment trends over time based on rev
 
 ## 📉 Detailed Line Chart
 <p align="center">
-  <img src="linechart_details.png" width="800">
+  <img src="images/linechart_details.png" width="800">
 </p>
 
 Detailed line chart analysis provides deeper insight into PLN Mobile user sentiment patterns and fluctuations.
@@ -115,7 +122,7 @@ Detailed line chart analysis provides deeper insight into PLN Mobile user sentim
 
 ## ✅ Text Analysis Result
 <p align="center">
-  <img src="hasil_analisis_teks.png" width="800">
+  <img src="images/hasil_analisis_teks.png" width="800">
 </p>
 
 Displays prediction results for aspect categories and sentiment polarity from single text analysis.
@@ -124,17 +131,11 @@ Displays prediction results for aspect categories and sentiment polarity from si
 
 ## ✅ File Analysis Result
 <p align="center">
-  <img src="hasil_analisis_file.png" width="800">
+  <img src="images/hasil_analisis_file.png" width="800">
 </p>
 
 Shows sentiment classification results from uploaded datasets along with filtering and export features.
 
----
-
-## 📖 User Guide
-<p align="center">
-  <img src="panduan.png" width="800">
-</p>
 
 ## 📁 Struktur Folder
 
