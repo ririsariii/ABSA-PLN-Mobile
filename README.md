@@ -72,7 +72,7 @@ ABSA PLN Mobile adalah sistem yang dirancang untuk menganalisis ulasan pengguna 
 
 ## 📖 User Guide
 <p align="center">
-  <img src="imagespanduan.png" width="800">
+  <img src="images/panduan.png" width="800">
 </p>
 
 ## 🔍 Text Analysis
