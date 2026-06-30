@@ -8,6 +8,7 @@ import numpy as np
 import joblib
 import json
 import os
+import io
 from datetime import datetime
 import plotly
 import plotly.graph_objs as go
@@ -19,13 +20,13 @@ from werkzeug.utils import secure_filename
 # ============================================================================
 
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # Max 16MB
 app.config['ALLOWED_EXTENSIONS'] = {'csv'}
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
-# Buat folder upload jika belum ada
-os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+# Catatan: file CSV TIDAK ditulis ke disk sama sekali.
+# Diproses langsung di memory agar kompatibel dengan environment
+# read-only filesystem seperti Vercel (serverless functions).
 
 # ============================================================================
 # LOAD MODEL DAN KOMPONEN
@@ -382,9 +383,12 @@ def predict_single_route():
 
 @app.route('/predict_batch', methods=['POST'])
 def predict_batch_route():
-    """Route untuk prediksi batch (CSV)"""
-    filepath = None
-    
+    """
+    Route untuk prediksi batch (CSV).
+    File CSV diproses LANGSUNG DI MEMORY, tidak pernah ditulis ke disk.
+    Ini wajib agar kompatibel dengan platform serverless seperti Vercel,
+    yang filesystem-nya read-only.
+    """
     try:
         if 'file' not in request.files:
             return jsonify({'error': 'File tidak ditemukan'}), 400
@@ -397,23 +401,20 @@ def predict_batch_route():
         if not allowed_file(file.filename):
             return jsonify({'error': 'Format file harus CSV'}), 400
         
-        # Save file
+        # Baca file langsung dari stream upload (in-memory), tanpa disimpan ke disk
         filename = secure_filename(file.filename)
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file_bytes = file.read()
         
-        os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-        file.save(filepath)
+        if not file_bytes:
+            return jsonify({'error': 'File kosong atau gagal dibaca'}), 400
         
-        if not os.path.exists(filepath):
-            return jsonify({'error': f'File gagal disimpan'}), 500
+        print(f"✓ File diterima di memory: {filename} ({len(file_bytes)} bytes)")
         
-        print(f"✓ File saved: {filepath}")
-        
-        # Read CSV
+        # Read CSV dari memory
         try:
-            df = pd.read_csv(filepath, encoding='utf-8')
+            df = pd.read_csv(io.BytesIO(file_bytes), encoding='utf-8')
         except UnicodeDecodeError:
-            df = pd.read_csv(filepath, encoding='latin-1')
+            df = pd.read_csv(io.BytesIO(file_bytes), encoding='latin-1')
         
         if len(df) == 0:
             return jsonify({'error': 'File CSV kosong'}), 400
@@ -529,14 +530,6 @@ function toggleUlasan(idx) {
 </script>
 '''
         
-        # Cleanup
-        try:
-            if filepath and os.path.exists(filepath):
-                os.remove(filepath)
-                print(f"✓ File deleted: {filepath}")
-        except Exception as e:
-            print(f"⚠️  Warning: Gagal hapus file {filepath}: {e}")
-        
         return render_template(
             'result_batch.html',
             table=table_html,
@@ -547,13 +540,6 @@ function toggleUlasan(idx) {
         )
     
     except Exception as e:
-        # Cleanup on error
-        try:
-            if filepath and os.path.exists(filepath):
-                os.remove(filepath)
-        except:
-            pass
-        
         print(f"❌ Error: {e}")
         import traceback
         traceback.print_exc()
